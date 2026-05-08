@@ -8,15 +8,30 @@ import httpx
 from datetime import timezone, timedelta
 import signal
 import sys
+import os
+from flask import Flask
+import threading
 
 MOSCOW_TZ = timezone(timedelta(hours=3))
-OPENROUTER_API_KEY = "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"
+import os
+OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY")
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 MODEL = "google/gemini-2.0-flash-001"
 # Токен от BotFather (храни его в секрете!)
-TOKEN = "8603697032:AAFiKhtwYW9wO47idS78cGxmXlPV-GvhreA"
+TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 diary = {}
 DATA_FILE = "diary.json"
+
+# Простой веб-сервер для Render (чтобы не ругался на отсутствие порта)
+web_app = Flask(__name__)
+
+@web_app.route('/')
+def home():
+    return "BotiK жив и работает!"
+
+def run_web():
+    port = int(os.environ.get("PORT", 10000))
+    web_app.run(host="0.0.0.0", port=port)
 
 #Сохранение данных
 def save_on_exit(sig, frame):
@@ -244,6 +259,9 @@ def main():
     app.job_queue.run_repeating(check_summary, interval=3600, first=10)
 
     signal.signal(signal.SIGINT, save_on_exit)  # Ctrl+C
+
+    # Запускаем веб-сервер в фоновом потоке
+    threading.Thread(target=run_web, daemon=True).start()
 
     # Запускаем бота (будет работать, пока не нажмём Ctrl+C)
     print("Ботик проснулся и готов работать!")
