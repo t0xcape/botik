@@ -28,7 +28,7 @@ web_app = Flask(__name__)
 
 @web_app.route('/internal_run_summary_2026')
 def trigger_check():
-    asyncio.ensure_future(manual_check())
+    asyncio.run(manual_check())
     return "OK", 200
 
 async def manual_check():
