@@ -12,6 +12,7 @@ import os
 from flask import Flask
 import threading
 
+app = None  # Будет заполнено в main()
 MOSCOW_TZ = timezone(timedelta(hours=3))
 import os
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY")
@@ -24,6 +25,32 @@ DATA_FILE = "diary.json"
 
 # Простой веб-сервер для Render (чтобы не ругался на отсутствие порта)
 web_app = Flask(__name__)
+
+@app.route('/internal_run_summary_2026')
+def trigger_check():
+    asyncio.ensure_future(manual_check())
+    return "OK", 200
+
+async def manual_check():
+    now = datetime.now(MOSCOW_TZ)
+    day = get_weekday()
+    print(f"[MANUAL CHECK] Запуск. День: {day}, Время: {now.time()}")
+
+    if day == "🌻 Воскресенье" and now.time() >= time(21, 0):
+        print(f"[MANUAL CHECK] Условие выполнено! Начинаем рассылку.")
+        for chat_id, user_diary in diary.items():
+            if user_diary:
+                try:
+                    summary = await generate_summary(user_diary)
+                    await app.bot.send_message(chat_id=chat_id, text=summary)
+                    print(f"[MANUAL CHECK] Отправлено для {chat_id}")
+                except Exception as e:
+                    print(f"[MANUAL CHECK] Ошибка отправки для {chat_id}: {e}")
+        diary.clear()
+        save_diary()
+    else:
+        print(f"[MANUAL CHECK] Условие не выполнено (день: {day}, время: {now.time()}).")
+
 
 @web_app.route('/')
 def home():
@@ -136,7 +163,7 @@ def load_diary():
 def save_diary():
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(diary, f, ensure_ascii=False, indent=2)
-
+"""
 #Проверка на день недели и отправка саммари по воскресеньям
 async def check_summary(context: ContextTypes.DEFAULT_TYPE):
     now = datetime.now(MOSCOW_TZ)
@@ -153,6 +180,7 @@ async def check_summary(context: ContextTypes.DEFAULT_TYPE):
         # Очищаем дневник для новой недели (всем пользователям)
         diary = {}
         save_diary()
+"""
 
 #Команда /summary — позволяет получить саммари в любой момент
 async def summary_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -240,6 +268,7 @@ async def generate_summary(week_data):
 # Главная функция — запускает бота
 def main():
     # Создаём приложение
+    global app
     app = Application.builder().token(TOKEN).build()
 
     global diary
@@ -258,7 +287,7 @@ def main():
     app.add_error_handler(error_handler)
 
     # Проверяем необходимость саммари каждый час (3600 секунд)
-    app.job_queue.run_repeating(check_summary, interval=3600, first=10)
+    #app.job_queue.run_repeating(check_summary, interval=3600, first=10)
 
     signal.signal(signal.SIGINT, save_on_exit)  # Ctrl+C
 
