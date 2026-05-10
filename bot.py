@@ -26,6 +26,17 @@ DATA_FILE = "diary.json"
 # Простой веб-сервер для Render (чтобы не ругался на отсутствие порта)
 web_app = Flask(__name__)
 
+
+@web_app.route('/test_save')
+def test_save():
+    try:
+        save_diary()
+        return "SAVE OK", 200
+    except Exception as e:
+        return f"SAVE ERROR: {e}", 500
+
+
+
 @web_app.route('/internal_run_summary_2026')
 def trigger_check():
     asyncio.run(manual_check())
