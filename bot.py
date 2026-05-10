@@ -143,7 +143,7 @@ async def check_summary(context: ContextTypes.DEFAULT_TYPE):
     day = get_weekday()
     print(f"[CHECK] Запуск проверки. День: {day}, Время: {now.time()}") # <-- ВОТ ЭТА СТРОКА
 
-    if day == "🌻 Воскресенье" and now.time() >= time(18, 0):
+    if True:
         print(f"[CHECK] Условие выполнено! Начинаем рассылку.") # <-- И ЭТА
         for chat_id, user_diary in diary.items():
             if user_diary:  # Если у пользователя есть записи
