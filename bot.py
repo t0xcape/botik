@@ -26,7 +26,7 @@ DATA_FILE = "diary.json"
 # Простой веб-сервер для Render (чтобы не ругался на отсутствие порта)
 web_app = Flask(__name__)
 
-@app.route('/internal_run_summary_2026')
+@web_app.route('/internal_run_summary_2026')
 def trigger_check():
     asyncio.ensure_future(manual_check())
     return "OK", 200
