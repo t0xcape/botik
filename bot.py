@@ -141,8 +141,10 @@ def save_diary():
 async def check_summary(context: ContextTypes.DEFAULT_TYPE):
     now = datetime.now(MOSCOW_TZ)
     day = get_weekday()
+    print(f"[CHECK] Запуск проверки. День: {day}, Время: {now.time()}") # <-- ВОТ ЭТА СТРОКА
 
     if day == "🌻 Воскресенье" and now.time() >= time(21, 0):
+        print(f"[CHECK] Условие выполнено! Начинаем рассылку.") # <-- И ЭТА
         for chat_id, user_diary in diary.items():
             if user_diary:  # Если у пользователя есть записи
                 summary = await generate_summary(user_diary)
