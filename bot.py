@@ -27,13 +27,14 @@ DATA_FILE = "diary.json"
 web_app = Flask(__name__)
 
 
-@web_app.route('/test_save')
-def test_save():
+@web_app.route('/get_diary')
+def get_diary():
     try:
-        save_diary()
-        return "SAVE OK", 200
-    except Exception as e:
-        return f"SAVE ERROR: {e}", 500
+        with open(DATA_FILE, "r", encoding="utf-8") as f:
+            content = f.read()
+        return content, 200, {'Content-Type': 'application/json'}
+    except FileNotFoundError:
+        return "{}", 200, {'Content-Type': 'application/json'}
 
 
 
