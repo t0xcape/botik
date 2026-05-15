@@ -274,9 +274,8 @@ async def generate_summary(week_data):
     if "choices" in data:
         return data["choices"][0]["message"]["content"]
     else:
-        print("Ошибка OpenRouter:", data)  # Покажет в терминале, если что не так
-        return "Извини, не смог сгенерировать саммари. Попробуй позже 🙏"
-
+        error_msg = str(data.get('error', data))
+        return f"Извини, не смог сгенерировать саммари. Ошибка: {error_msg[:500]}"
 # Главная функция — запускает бота
 def main():
     # Создаём приложение
