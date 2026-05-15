@@ -17,7 +17,7 @@ MOSCOW_TZ = timezone(timedelta(hours=3))
 import os
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY")
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
-MODEL = "google/gemini-2.0-flash-001"
+MODEL = "deepseek/deepseek-chat"
 # Токен от BotFather (храни его в секрете!)
 TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 diary = {}
